@@ -21,7 +21,7 @@
     {
     if ((self = [super init]) != NULL)
         {
-        fileHandle = [inFileHandle retain];
+        fileHandle = inFileHandle;
 		[fileHandle seekToEndOfFile];
         synchronizeOnWrite = YES;
         #if NS_BLOCKS_AVAILABLE
@@ -68,16 +68,10 @@
     
 - (void)dealloc
     {
-    [fileHandle release];
-    fileHandle = NULL;
     
-    [transformer release];
-    transformer = NULL;
 
-    [block release];
     block = NULL;
     //
-    [super dealloc];
     }
 
 

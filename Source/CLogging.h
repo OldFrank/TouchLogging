@@ -98,18 +98,14 @@
 #define Log_(level, ...) \
 	do \
 		{ \
-		NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init]; \
 		[[CLogging sharedInstance] logLevel:(level) fileFunctionLine:FileFunctionLine_() userInfo:FileFunctionLineDict_() messageFormat:__VA_ARGS__]; \
-		[thePool release]; \
 		} \
 	while (0)
 
 #define LogDict_(level, dict, ...) \
 	do \
 		{ \
-		NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init]; \
 		[[CLogging sharedInstance] logLevel:(level) fileFunctionLine:FileFunctionLine_() userInfo:dict messageFormat:__VA_ARGS__]; \
-		[thePool release]; \
 		} \
 	while (0)
 

@@ -19,8 +19,8 @@
     if ((self = [super init]) != NULL)
         {
         parentSession = inParentSession;
-        identifier = [inIdentifier retain];
-        started = [[NSDate date] retain];
+        identifier = inIdentifier;
+        started = [NSDate date];
         }
     return(self);
     }
@@ -29,13 +29,8 @@
     {
     parentSession = NULL;
     
-    [identifier release];
-    identifier = NULL;
     
-    [started release];
-    started = NULL;
     //
-    [super dealloc];
     }
 
 @end

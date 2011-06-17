@@ -48,7 +48,7 @@ static CLogging *gInstance = NULL;
 
 + (CLogging *)sharedInstance
     {
-    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
 
     @synchronized(@"CLogging.instance")
         {
@@ -58,7 +58,7 @@ static CLogging *gInstance = NULL;
             }
         }
 
-    [thePool release];
+    }
 
     return(gInstance);
     }
@@ -76,7 +76,7 @@ static CLogging *gInstance = NULL;
             enabled = YES;
 
 		@try {
-			[self addDestination:[[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleWithStandardError]] autorelease]];
+			[self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleWithStandardError]]];
 			}
 		@catch (NSException * e)
 			{
@@ -93,7 +93,7 @@ static CLogging *gInstance = NULL;
 		
 		if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == YES)
 			{
-			[self addDestination:[[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleForWritingToURL:theLogFile error:&theError]] autorelease]];
+			[self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleForWritingToURL:theLogFile error:&theError]]];
 			}
         }
     return(self);
@@ -103,14 +103,7 @@ static CLogging *gInstance = NULL;
     {
     [self endSession];
 
-    [sender release];
-    sender = NULL;
-    [facility release];
-    facility = NULL;
-    [destinations release];
-    destinations = NULL;
     //
-    [super dealloc];
     }
 
 #pragma mark -
@@ -149,7 +142,7 @@ static CLogging *gInstance = NULL;
 
 - (void)startSession:(NSString *)inIdentifier
     {
-    [self.sessions addObject:[[[CLogSession alloc] initWithParentSession:[self.sessions lastObject] identifier:inIdentifier] autorelease]];
+    [self.sessions addObject:[[CLogSession alloc] initWithParentSession:[self.sessions lastObject] identifier:inIdentifier]];
 
     for (id <CLoggingDestination> theHandler in self.destinations)
         {
@@ -204,65 +197,65 @@ static CLogging *gInstance = NULL;
 
 - (void)logLevel:(int)inLevel format:(NSString *)inFormat, ...
     {
-    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
 
     va_list theArgList;
     va_start(theArgList, inFormat);
-    NSString *theMessage = [[[NSString alloc] initWithFormat:inFormat arguments:theArgList] autorelease];
+    NSString *theMessage = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
     va_end(theArgList);
 
-    CLogEvent *theEvent = [[[CLogEvent alloc] init] autorelease];
+    CLogEvent *theEvent = [[CLogEvent alloc] init];
     theEvent.level = inLevel;
     theEvent.message = theMessage;
         
     [self logEvent:theEvent];
 
-    [thePool release];
+    }
     }
 
 - (void)logLevel:(int)inLevel userInfo:(NSDictionary *)inDictionary messageFormat:(NSString *)inFormat, ...;
     {
-    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
 
     va_list theArgList;
     va_start(theArgList, inFormat);
-    NSString *theMessage = [[[NSString alloc] initWithFormat:inFormat arguments:theArgList] autorelease];
+    NSString *theMessage = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
     va_end(theArgList);
 
-    CLogEvent *theEvent = [[[CLogEvent alloc] init] autorelease];
+    CLogEvent *theEvent = [[CLogEvent alloc] init];
     theEvent.level = inLevel;
     theEvent.message = theMessage;
     theEvent.userInfo = inDictionary;
 
     [self logEvent:theEvent];
 
-    [thePool release];
+    }
     }
 
 - (void)logLevel:(int)inLevel fileFunctionLine:(SFileFunctionLine)inFileFunctionLine userInfo:(NSDictionary *)inDictionary messageFormat:(NSString *)inFormat, ...;
     {
-    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
 
     va_list theArgList;
     va_start(theArgList, inFormat);
-    NSString *theMessageString = [[[NSString alloc] initWithFormat:inFormat arguments:theArgList] autorelease];
+    NSString *theMessageString = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
     va_end(theArgList);
 
-    CLogEvent *theEvent = [[[CLogEvent alloc] init] autorelease];
+    CLogEvent *theEvent = [[CLogEvent alloc] init];
     theEvent.level = inLevel;
     theEvent.message = theMessageString;
     theEvent.userInfo = inDictionary;
 
     [self logEvent:theEvent];
     
-    [thePool release];
+    }
     }
 
 #pragma mark -
 
 - (void)logError:(NSError *)inError
     {
-    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
 
     NSMutableDictionary *theUserInfo = [NSMutableDictionary dictionaryWithDictionary:inError.userInfo];
     [theUserInfo setObject:[inError domain] forKey:@"domain"];
@@ -274,7 +267,7 @@ static CLogging *gInstance = NULL;
     if ([inError localizedRecoverySuggestion] != NULL)
         [theUserInfo setObject:[inError localizedRecoverySuggestion] forKey:@"localizedRecoverySuggestion"];
 
-    CLogEvent *theEvent = [[[CLogEvent alloc] init] autorelease];
+    CLogEvent *theEvent = [[CLogEvent alloc] init];
 
     theEvent.level = LoggingLevel_ERR;
     NSNumber *theLevelValue = [inError.userInfo objectForKey:@"level"];
@@ -287,12 +280,12 @@ static CLogging *gInstance = NULL;
 
     [self logEvent:theEvent];
 
-    [thePool release];
+    }
     }
 
 - (void)logException:(NSException *)inException
     {
-    NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+    @autoreleasepool {
 
     if ([inException.userInfo objectForKey:@"error"] != NULL)
         [self logError:[inException.userInfo objectForKey:@"error"]];
@@ -312,7 +305,7 @@ static CLogging *gInstance = NULL;
         [self logLevel:theLevel userInfo:theDictionary messageFormat:@"%@", [inException reason]];
         }
 
-    [thePool release];
+    }
     }
 
 @end

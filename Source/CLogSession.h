@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface CLogSession : NSObject {
-    CLogSession *parentSession;
+    CLogSession *__unsafe_unretained parentSession;
     NSString *identifier;
     NSDate *started;
 }

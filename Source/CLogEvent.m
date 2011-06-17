@@ -20,28 +20,6 @@
 @synthesize message;
 @synthesize userInfo;
 
-- (void)dealloc
-    {
-    [session release];
-    session = NULL;
-    
-    [timestamp release];
-    timestamp = NULL;
-
-    [sender release];
-    sender = NULL;
-
-    [facility release];
-    facility = NULL;
-
-    [message release];
-    message = NULL;
-
-    [userInfo release];
-    userInfo = NULL;
-    //
-    [super dealloc];
-    }
     
 - (NSString *)description
     {
