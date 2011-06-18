@@ -40,11 +40,6 @@
 @protocol CLoggingDestination;
 
 @interface CLogging : NSObject {
-	BOOL enabled;
-	NSString *sender;
-	NSString *facility;
-    NSMutableArray *sessions;
-    NSMutableArray *destinations;
 }
 
 @property (readwrite, assign) BOOL enabled;

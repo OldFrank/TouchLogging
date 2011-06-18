@@ -25,12 +25,4 @@
     return(self);
     }
 
-- (void)dealloc
-    {
-    parentSession = NULL;
-    
-    
-    //
-    }
-
 @end

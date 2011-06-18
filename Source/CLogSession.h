@@ -9,9 +9,6 @@
 #import <Foundation/Foundation.h>
 
 @interface CLogSession : NSObject {
-    CLogSession *__unsafe_unretained parentSession;
-    NSString *identifier;
-    NSDate *started;
 }
 
 @property (readonly, nonatomic, assign) CLogSession *parentSession;

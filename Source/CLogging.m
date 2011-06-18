@@ -48,8 +48,6 @@ static CLogging *gInstance = NULL;
 
 + (CLogging *)sharedInstance
     {
-    @autoreleasepool {
-
     @synchronized(@"CLogging.instance")
         {
         if (gInstance == NULL)
@@ -57,8 +55,6 @@ static CLogging *gInstance = NULL;
             gInstance = [[CLogging alloc] init];
             }
         }
-
-    }
 
     return(gInstance);
     }
@@ -102,8 +98,6 @@ static CLogging *gInstance = NULL;
 - (void)dealloc
     {
     [self endSession];
-
-    //
     }
 
 #pragma mark -
@@ -197,8 +191,6 @@ static CLogging *gInstance = NULL;
 
 - (void)logLevel:(int)inLevel format:(NSString *)inFormat, ...
     {
-    @autoreleasepool {
-
     va_list theArgList;
     va_start(theArgList, inFormat);
     NSString *theMessage = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
@@ -209,14 +201,10 @@ static CLogging *gInstance = NULL;
     theEvent.message = theMessage;
         
     [self logEvent:theEvent];
-
-    }
     }
 
 - (void)logLevel:(int)inLevel userInfo:(NSDictionary *)inDictionary messageFormat:(NSString *)inFormat, ...;
     {
-    @autoreleasepool {
-
     va_list theArgList;
     va_start(theArgList, inFormat);
     NSString *theMessage = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
@@ -228,14 +216,10 @@ static CLogging *gInstance = NULL;
     theEvent.userInfo = inDictionary;
 
     [self logEvent:theEvent];
-
-    }
     }
 
 - (void)logLevel:(int)inLevel fileFunctionLine:(SFileFunctionLine)inFileFunctionLine userInfo:(NSDictionary *)inDictionary messageFormat:(NSString *)inFormat, ...;
     {
-    @autoreleasepool {
-
     va_list theArgList;
     va_start(theArgList, inFormat);
     NSString *theMessageString = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
@@ -247,16 +231,12 @@ static CLogging *gInstance = NULL;
     theEvent.userInfo = inDictionary;
 
     [self logEvent:theEvent];
-    
-    }
     }
 
 #pragma mark -
 
 - (void)logError:(NSError *)inError
     {
-    @autoreleasepool {
-
     NSMutableDictionary *theUserInfo = [NSMutableDictionary dictionaryWithDictionary:inError.userInfo];
     [theUserInfo setObject:[inError domain] forKey:@"domain"];
     [theUserInfo setObject:[NSNumber numberWithInteger:[inError code]] forKey:@"code"];
@@ -279,14 +259,10 @@ static CLogging *gInstance = NULL;
     theEvent.userInfo = theUserInfo;
 
     [self logEvent:theEvent];
-
-    }
     }
 
 - (void)logException:(NSException *)inException
     {
-    @autoreleasepool {
-
     if ([inException.userInfo objectForKey:@"error"] != NULL)
         [self logError:[inException.userInfo objectForKey:@"error"]];
     else
@@ -304,8 +280,6 @@ static CLogging *gInstance = NULL;
 
         [self logLevel:theLevel userInfo:theDictionary messageFormat:@"%@", [inException reason]];
         }
-
-    }
     }
 
 @end

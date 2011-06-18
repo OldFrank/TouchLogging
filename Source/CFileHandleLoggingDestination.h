@@ -11,12 +11,6 @@
 #import "CLogging.h"
 
 @interface CFileHandleLoggingDestination : NSObject <CLoggingDestination> {
-    NSFileHandle *fileHandle;
-    BOOL synchronizeOnWrite;
-    NSValueTransformer *transformer;
-#if NS_BLOCKS_AVAILABLE
-    NSData *(^block)(CLogEvent *inEvent);
-#endif /* NS_BLOCKS_AVAILABLE */
 }
 
 @property (readwrite, nonatomic, retain) NSFileHandle *fileHandle;

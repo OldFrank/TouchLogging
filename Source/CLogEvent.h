@@ -22,13 +22,6 @@ typedef enum {
 @class CLogSession;
 
 @interface CLogEvent : NSObject {
-    CLogSession *session;
-    NSInteger level;
-    NSDate *timestamp;
-    NSString *sender;
-    NSString *facility;
-    NSString *message;
-    NSDictionary *userInfo;
 }
 
 @property (readwrite, nonatomic, retain) CLogSession *session;
