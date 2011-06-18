@@ -15,10 +15,7 @@
 
 @property (readwrite, nonatomic, retain) NSFileHandle *fileHandle;
 @property (readwrite, nonatomic, assign) BOOL synchronizeOnWrite;
-@property (readwrite, nonatomic, retain) NSValueTransformer *transformer;
-#if NS_BLOCKS_AVAILABLE
 @property (readwrite, nonatomic, copy) NSData *(^block)(CLogEvent *inEvent);
-#endif /* NS_BLOCKS_AVAILABLE */
 
 - (id)initWithFileHandle:(NSFileHandle *)inFileHandle;
 

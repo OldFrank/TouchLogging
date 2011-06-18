@@ -12,10 +12,7 @@
 
 @synthesize fileHandle;
 @synthesize synchronizeOnWrite;
-@synthesize transformer;
-#if NS_BLOCKS_AVAILABLE
 @synthesize block;
-#endif /* NS_BLOCKS_AVAILABLE */
 
 - (id)initWithFileHandle:(NSFileHandle *)inFileHandle
     {
@@ -24,7 +21,6 @@
         fileHandle = inFileHandle;
 		[fileHandle seekToEndOfFile];
         synchronizeOnWrite = YES;
-        #if NS_BLOCKS_AVAILABLE
         block = ^(CLogEvent *inEvent) {
             char *theLevelString = NULL;
             switch (inEvent.level)
@@ -61,32 +57,18 @@
             NSData *theData = [theString dataUsingEncoding:NSUTF8StringEncoding];
             return(theData);
             };
-        #endif /* NS_BLOCKS_AVAILABLE */
         }
     return(self);
     }
     
-- (void)dealloc
-    {
-    
-
-    block = NULL;
-    //
-    }
-
-
 - (BOOL)logging:(CLogging *)inLogging didLogEvent:(CLogEvent *)inEvent;
     {
-    NSData *theData = [self.transformer transformedValue:inEvent];
-#if NS_BLOCKS_AVAILABLE
-    if (theData == NULL)
+    NSData *theData = NULL;
+    
+    if (self.block)
         {
-        if (self.block)
-            {
-            theData = self.block(inEvent);
-            }
+        theData = self.block(inEvent);
         }
-#endif /* NS_BLOCKS_AVAILABLE */
 
     if (theData != NULL)
         {
