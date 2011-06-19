@@ -34,4 +34,6 @@ typedef enum {
 
 + (NSString *)stringForLevel:(NSInteger)inLevel;
 
+- (NSDictionary *)asDictionary;
+
 @end
