@@ -13,10 +13,14 @@
 @interface CFileHandleLoggingDestination : NSObject <CLoggingDestination> {
 }
 
+@property (readwrite, nonatomic, retain) NSURL *URL;
 @property (readwrite, nonatomic, retain) NSFileHandle *fileHandle;
 @property (readwrite, nonatomic, assign) BOOL synchronizeOnWrite;
 @property (readwrite, nonatomic, copy) NSData *(^block)(CLogEvent *inEvent);
+@property (readwrite, nonatomic, retain) NSData *initialData;
+@property (readwrite, nonatomic, retain) NSData *terminalData;
 
+- (id)initWithURL:(NSURL *)inURL;
 - (id)initWithFileHandle:(NSFileHandle *)inFileHandle;
 
 @end
