@@ -31,9 +31,17 @@
 
 #import "CFileHandleLoggingDestination.h"
 
+NSString *kLogSenderKey = @"sender";
+NSString *kLogFacilityKey = @"facility";
+NSString *kLogOnceKey = @"once";
+NSString *kLogFileKey = @"file";
+NSString *kLogFunctionKey = @"function";
+NSString *kLogLineKey = @"line";
+
 static CLogging *gInstance = NULL;
 
 @interface CLogging ()
+@property (readwrite, nonatomic, retain) NSMutableSet *oneShotEvents;
 @end
 
 #pragma mark -
@@ -45,6 +53,8 @@ static CLogging *gInstance = NULL;
 @synthesize facility;
 @synthesize sessions;
 @synthesize destinations;
+
+@synthesize oneShotEvents;
 
 + (CLogging *)sharedInstance
     {
@@ -71,26 +81,7 @@ static CLogging *gInstance = NULL;
         else
             enabled = YES;
 
-		@try {
-			[self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleWithStandardError]]];
-			}
-		@catch (NSException * e)
-			{
-			}
-
-		NSError *theError = NULL;
-		NSURL *theLogFile = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:0 create:YES error:&theError];
-		theLogFile = [theLogFile URLByAppendingPathComponent:@"Run.log"];
-		
-		if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == NO)
-			{
-			[[NSData data] writeToURL:theLogFile atomically:NO];
-			}
-		
-		if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == YES)
-			{
-			[self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleForWritingToURL:theLogFile error:&theError]]];
-			}
+        oneShotEvents = [[NSMutableSet alloc] init];
         }
     return(self);
     }
@@ -112,6 +103,25 @@ static CLogging *gInstance = NULL;
     }
 
 #pragma mark -
+
+- (void)addDefaultDestinations
+    {
+    [self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleWithStandardError]]];
+
+    NSError *theError = NULL;
+    NSURL *theLogFile = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:0 create:YES error:&theError];
+    theLogFile = [theLogFile URLByAppendingPathComponent:@"Run.log"];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == NO)
+        {
+        [[NSData data] writeToURL:theLogFile atomically:NO];
+        }
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == YES)
+        {
+        [self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleForWritingToURL:theLogFile error:&theError]]];
+        }
+    }
 
 - (void)addDestination:(id <CLoggingDestination>)inHandler
     {
@@ -168,10 +178,20 @@ static CLogging *gInstance = NULL;
     if (self.enabled == NO)
         return;
         
+    if ([[inLogEvent.userInfo objectForKey:kLogOnceKey] boolValue] == YES)
+        {
+        if ([self.oneShotEvents containsObject:inLogEvent.message])
+            {
+            return;
+            }
+        [self.oneShotEvents addObject:inLogEvent.message];
+        }
+
     if (self.sessions.count == 0)
         {
         [self startSession:@"root"];
         }
+        
 
     inLogEvent.session = [self.sessions lastObject];
     inLogEvent.timestamp = [NSDate date];
@@ -203,7 +223,7 @@ static CLogging *gInstance = NULL;
     [self logEvent:theEvent];
     }
 
-- (void)logLevel:(int)inLevel userInfo:(NSDictionary *)inDictionary messageFormat:(NSString *)inFormat, ...;
+- (void)logLevel:(int)inLevel userInfo:(NSDictionary *)inUserInfo messageFormat:(NSString *)inFormat, ...;
     {
     va_list theArgList;
     va_start(theArgList, inFormat);
@@ -213,22 +233,42 @@ static CLogging *gInstance = NULL;
     CLogEvent *theEvent = [[CLogEvent alloc] init];
     theEvent.level = inLevel;
     theEvent.message = theMessage;
-    theEvent.userInfo = inDictionary;
+    theEvent.userInfo = inUserInfo;
 
     [self logEvent:theEvent];
     }
 
-- (void)logLevel:(int)inLevel fileFunctionLine:(SFileFunctionLine)inFileFunctionLine userInfo:(NSDictionary *)inDictionary messageFormat:(NSString *)inFormat, ...;
+- (void)logLevel:(int)inLevel fileFunctionLine:(SFileFunctionLine)inFileFunctionLine userInfo:(NSDictionary *)inUserInfo messageFormat:(NSString *)inFormat, ...;
     {
     va_list theArgList;
     va_start(theArgList, inFormat);
     NSString *theMessageString = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
     va_end(theArgList);
 
+    NSMutableDictionary *theUserInfo = [inUserInfo copy];
+    [theUserInfo setObject:[NSString stringWithUTF8String:inFileFunctionLine.file] forKey:kLogFileKey];
+    [theUserInfo setObject:[NSString stringWithUTF8String:inFileFunctionLine.function] forKey:kLogFunctionKey];
+    [theUserInfo setObject:[NSNumber numberWithInt:inFileFunctionLine.line] forKey:kLogLineKey];
+
     CLogEvent *theEvent = [[CLogEvent alloc] init];
     theEvent.level = inLevel;
     theEvent.message = theMessageString;
-    theEvent.userInfo = inDictionary;
+
+    NSString *theFacility = [theUserInfo objectForKey:kLogFacilityKey];
+    if (theFacility)
+        {
+        theEvent.facility = theFacility;
+        [theUserInfo removeObjectForKey:kLogFacilityKey];
+        }
+
+    NSString *theSender = [theUserInfo objectForKey:kLogSenderKey];
+    if (theSender)
+        {
+        theEvent.sender = theSender;
+        [theUserInfo removeObjectForKey:kLogSenderKey];
+        }
+
+    theEvent.userInfo = theUserInfo;
 
     [self logEvent:theEvent];
     }

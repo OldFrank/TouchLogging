@@ -39,6 +39,13 @@
 
 @protocol CLoggingDestination;
 
+extern NSString *kLogSenderKey;
+extern NSString *kLogFacilityKey;
+extern NSString *kLogOnceKey;
+extern NSString *kLogFileKey;
+extern NSString *kLogFunctionKey;
+extern NSString *kLogLineKey;
+
 @interface CLogging : NSObject {
 }
 
@@ -51,6 +58,7 @@
 /** Returns the thread's logging instance */
 + (CLogging *)sharedInstance;
 
+- (void)addDefaultDestinations;
 - (void)addDestination:(id <CLoggingDestination>)inHandler;
 - (void)removeDestination:(id <CLoggingDestination>)inHandler;
 
@@ -93,7 +101,7 @@
 #define Log_(level, ...) \
 	do \
 		{ \
-		[[CLogging sharedInstance] logLevel:(level) fileFunctionLine:FileFunctionLine_() userInfo:FileFunctionLineDict_() messageFormat:__VA_ARGS__]; \
+		[[CLogging sharedInstance] logLevel:(level) fileFunctionLine:FileFunctionLine_() userInfo:NULL messageFormat:__VA_ARGS__]; \
 		} \
 	while (0)
 
@@ -113,6 +121,8 @@
 #define LogInformation_(...) Log_(LoggingLevel_INFO, __VA_ARGS__)
 #define LogDebug_(...) Log_(LoggingLevel_DEBUG, __VA_ARGS__)
 
+#define LogOnce_(level, ...) LogDict_(level, [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:kLogOnceKey], __VA_ARGS__)
+    
 #else
 
 #define Log_(level, ...)
@@ -125,5 +135,7 @@
 #define LogNotice_(...)
 #define LogInformation_(...)
 #define LogDebug_(...)
+
+#define LogOnce_(level, ...)
 
 #endif /* LOGGING == 1 */
