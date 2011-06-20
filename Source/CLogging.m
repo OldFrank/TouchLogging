@@ -245,7 +245,7 @@ static CLogging *gInstance = NULL;
     NSString *theMessageString = [[NSString alloc] initWithFormat:inFormat arguments:theArgList];
     va_end(theArgList);
 
-    NSMutableDictionary *theUserInfo = [inUserInfo copy];
+    NSMutableDictionary *theUserInfo = [inUserInfo mutableCopy];
     [theUserInfo setObject:[NSString stringWithUTF8String:inFileFunctionLine.file] forKey:kLogFileKey];
     [theUserInfo setObject:[NSString stringWithUTF8String:inFileFunctionLine.function] forKey:kLogFunctionKey];
     [theUserInfo setObject:[NSNumber numberWithInt:inFileFunctionLine.line] forKey:kLogLineKey];
