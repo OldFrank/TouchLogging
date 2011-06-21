@@ -29,6 +29,7 @@
 
 #import "CLogging.h"
 
+#import "CFileLoggingDestination.h"
 #import "CFileHandleLoggingDestination.h"
 
 NSString *kLogSenderKey = @"sender";
@@ -117,14 +118,19 @@ static CLogging *gInstance = NULL;
         [[NSData data] writeToURL:theLogFile atomically:NO];
         }
     
-    if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == YES)
-        {
-        [self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleForWritingToURL:theLogFile error:&theError]]];
-        }
+//    if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == YES)
+//        {
+//        [self addDestination:[[CFileLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleForWritingToURL:theLogFile error:&theError]]];
+//        }
     }
 
 - (void)addDestination:(id <CLoggingDestination>)inHandler
     {
+    if (inHandler == NULL)
+        {
+        return;
+        }
+
     if (self.destinations == NULL)
         self.destinations = [NSMutableArray array];
 
@@ -271,6 +277,39 @@ static CLogging *gInstance = NULL;
     theEvent.userInfo = theUserInfo;
 
     [self logEvent:theEvent];
+    }
+
++ (NSString *)nameForLevel:(int)inLevel;
+    {
+    NSString *theLevelString = NULL;
+    switch (inLevel)
+        {
+        case LoggingLevel_EMERG:
+            theLevelString = @"EMERG";
+            break;
+        case LoggingLevel_ALERT:
+            theLevelString = @"ALERT";
+            break;
+        case LoggingLevel_CRIT:
+            theLevelString = @"CRIT";
+            break;
+        case LoggingLevel_ERR:
+            theLevelString = @"ERROR";
+            break;
+        case LoggingLevel_WARNING:
+            theLevelString = @"WARN";
+            break;
+        case LoggingLevel_NOTICE:
+            theLevelString = @"NOTICE";
+            break;
+        case LoggingLevel_INFO:
+            theLevelString = @"INFO";
+            break;
+        case LoggingLevel_DEBUG:
+            theLevelString = @"DEBUG";
+            break;
+        }
+    return(theLevelString);
     }
 
 #pragma mark -

@@ -6,8 +6,8 @@
 //  Copyright 2011 toxicsoftware.com. All rights reserved.
 //
 
-#import "CFileHandleLoggingDestination.h"
+#import "CFileLoggingDestination.h"
 
-@interface CJSONFileLoggingDestination : CFileHandleLoggingDestination
+@interface CJSONFileLoggingDestination : CFileLoggingDestination
 
 @end

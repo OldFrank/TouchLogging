@@ -75,6 +75,8 @@ extern NSString *kLogLineKey;
 - (void)logError:(NSError *)inError;
 - (void)logException:(NSException *)inException;
 
++ (NSString *)nameForLevel:(int)inLevel;
+
 @end
 
 #pragma mark -
