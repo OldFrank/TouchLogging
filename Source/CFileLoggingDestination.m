@@ -70,17 +70,17 @@
         {
         NSError *theError = NULL;
         
-        NSMutableData *theData = [NSMutableData data];
+        NSMutableData *theMutableData = [NSMutableData data];
         if (self.initialData)
             {
-            [theData appendData:self.initialData];
+            [theMutableData appendData:self.initialData];
             }
         if (self.terminalData)
             {
-            [theData appendData:self.terminalData];
+            [theMutableData appendData:self.terminalData];
             }
         
-        if ([theData writeToURL:self.URL options:0 error:&theError] == NO)
+        if ([theMutableData writeToURL:self.URL options:0 error:&theError] == NO)
             {
             NSLog(@"Could not create file");
             }
@@ -90,7 +90,7 @@
 
 
     NSData *theTerminalData = self.terminalData;
-    off_t theTerminalDataLength = theTerminalData.length;
+    size_t theTerminalDataLength = theTerminalData.length;
     
     if (theTerminalData.length > 0)
         {

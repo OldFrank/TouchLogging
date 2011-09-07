@@ -39,7 +39,7 @@ NSString *kLogFileKey = @"file";
 NSString *kLogFunctionKey = @"function";
 NSString *kLogLineKey = @"line";
 
-static CLogging *gInstance = NULL;
+static CLogging *gSharedInstance = NULL;
 
 @interface CLogging ()
 @property (readwrite, nonatomic, retain) NSMutableSet *oneShotEvents;
@@ -59,15 +59,11 @@ static CLogging *gInstance = NULL;
 
 + (CLogging *)sharedInstance
     {
-    @synchronized(@"CLogging.instance")
-        {
-        if (gInstance == NULL)
-            {
-            gInstance = [[CLogging alloc] init];
-            }
-        }
-
-    return(gInstance);
+    static dispatch_once_t sOnceToken = 0;
+    dispatch_once(&sOnceToken, ^{
+        gSharedInstance = [[CLogging alloc] init];
+        });
+    return(gSharedInstance);
     }
 
 #pragma mark -
@@ -82,6 +78,7 @@ static CLogging *gInstance = NULL;
         else
             enabled = YES;
 
+        sessions = [[NSMutableArray alloc] init];
         oneShotEvents = [[NSMutableSet alloc] init];
         }
     return(self);
@@ -90,17 +87,6 @@ static CLogging *gInstance = NULL;
 - (void)dealloc
     {
     [self endSession];
-    }
-
-#pragma mark -
-
-- (NSMutableArray *)sessions
-    {
-    if (sessions == NULL)
-        {
-        sessions = [[NSMutableArray alloc] init];
-        }
-    return(sessions);
     }
 
 #pragma mark -

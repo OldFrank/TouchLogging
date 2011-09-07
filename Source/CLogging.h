@@ -49,11 +49,11 @@ extern NSString *kLogLineKey;
 @interface CLogging : NSObject {
 }
 
-@property (readwrite, assign) BOOL enabled;
-@property (readwrite, copy) NSString *sender;
-@property (readwrite, copy) NSString *facility;
-@property (readonly, retain) NSMutableArray *sessions;
-@property (readwrite, retain) NSMutableArray *destinations;
+@property (readwrite, atomic, assign) BOOL enabled;
+@property (readwrite, atomic, copy) NSString *sender;
+@property (readwrite, atomic, copy) NSString *facility;
+@property (readonly, atomic, retain) NSMutableArray *sessions;
+@property (readwrite, atomic, retain) NSMutableArray *destinations;
 
 /** Returns the thread's logging instance */
 + (CLogging *)sharedInstance;
@@ -118,9 +118,12 @@ extern NSString *kLogLineKey;
 #define LogAlert_(...) Log_(LoggingLevel_ALERT, __VA_ARGS__)
 #define LogCritical_(...) Log_(LoggingLevel_CRIT, __VA_ARGS__)
 #define LogError_(...) Log_(LoggingLevel_ERR, __VA_ARGS__)
+#define LogErr_(...) Log_(LoggingLevel_ERR, __VA_ARGS__)
 #define LogWarning_(...) Log_(LoggingLevel_WARNING, __VA_ARGS__)
+#define LogWarn_(...) Log_(LoggingLevel_WARNING, __VA_ARGS__)
 #define LogNotice_(...) Log_(LoggingLevel_NOTICE, __VA_ARGS__)
 #define LogInformation_(...) Log_(LoggingLevel_INFO, __VA_ARGS__)
+#define LogInfo_(...) Log_(LoggingLevel_INFO, __VA_ARGS__)
 #define LogDebug_(...) Log_(LoggingLevel_DEBUG, __VA_ARGS__)
 
 #define LogOnce_(level, ...) LogDict_(level, [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:kLogOnceKey], __VA_ARGS__)
