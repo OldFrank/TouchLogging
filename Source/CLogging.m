@@ -31,6 +31,7 @@
 
 #import "CFileLoggingDestination.h"
 #import "CFileHandleLoggingDestination.h"
+#import "CLogSession.h"
 
 NSString *kLogSenderKey = @"sender";
 NSString *kLogFacilityKey = @"facility";
@@ -96,18 +97,19 @@ static CLogging *gSharedInstance = NULL;
     [self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleWithStandardError]]];
 
     NSError *theError = NULL;
-    NSURL *theLogFile = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:0 create:YES error:&theError];
-    theLogFile = [theLogFile URLByAppendingPathComponent:@"Run.log"];
+    NSURL *theLogDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSLibraryDirectory inDomain:NSUserDomainMask appropriateForURL:0 create:YES error:&theError];
     
-    if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == NO)
+    theLogDirectoryURL = [theLogDirectoryURL URLByAppendingPathComponent:@"Logs" isDirectory:YES];
+    [[NSFileManager defaultManager] createDirectoryAtURL:theLogDirectoryURL withIntermediateDirectories:YES attributes:NULL error:&theError];
+    
+    NSURL *theLogFileURL = [theLogDirectoryURL URLByAppendingPathComponent:@"Run.log"];
+    
+    if ([theLogFileURL checkResourceIsReachableAndReturnError:&theError] == NO)
         {
-        [[NSData data] writeToURL:theLogFile atomically:NO];
+        [[NSData data] writeToURL:theLogFileURL atomically:NO];
         }
     
-//    if ([[NSFileManager defaultManager] fileExistsAtPath:theLogFile.path] == YES)
-//        {
-//        [self addDestination:[[CFileLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleForWritingToURL:theLogFile error:&theError]]];
-//        }
+    [self addDestination:[[CFileLoggingDestination alloc] initWithURL:theLogFileURL]];
     }
 
 - (void)addDestination:(id <CLoggingDestination>)inHandler
@@ -147,7 +149,6 @@ static CLogging *gSharedInstance = NULL;
             [theHandler loggingDidStart:self];
             }
         }
-
     }
 
 - (void)endSession

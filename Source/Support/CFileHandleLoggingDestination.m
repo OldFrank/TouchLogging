@@ -8,6 +8,8 @@
 
 #import "CFileHandleLoggingDestination.h"
 
+#import "CLogSession.h"
+
 @implementation CFileHandleLoggingDestination
 
 @synthesize fileHandle;
@@ -21,7 +23,7 @@
             NSString *theLevelString = [CLogging nameForLevel:inEvent.level];
             NSTimeInterval theInterval = [inEvent.timestamp timeIntervalSinceDate:inEvent.session.started];    
             
-            NSString *theString = [NSString stringWithFormat:@"%-6@: %8.3f : %@\n", theLevelString, theInterval, inEvent.message];
+            NSString *theString = [NSString stringWithFormat:@"%-5.5s : %7.3f : %@\n", [theLevelString UTF8String], theInterval, inEvent.message];
             NSData *theData = [theString dataUsingEncoding:NSUTF8StringEncoding];
             return(theData);
             };

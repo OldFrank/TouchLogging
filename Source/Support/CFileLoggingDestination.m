@@ -11,6 +11,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#import "CLogSession.h"
+
+// TODO -- use GCD io.
+
 @interface CFileLoggingDestination ()
 @end
 
@@ -31,7 +35,7 @@
             NSString *theLevelString = [CLogging nameForLevel:inEvent.level];
             NSTimeInterval theInterval = [inEvent.timestamp timeIntervalSinceDate:inEvent.session.started];    
             
-            NSString *theString = [NSString stringWithFormat:@"%-6@: %8.3f : %@\n", theLevelString, theInterval, inEvent.message];
+            NSString *theString = [NSString stringWithFormat:@"%-5.5s : %7.3f : %@\n", [theLevelString UTF8String], theInterval, inEvent.message];
             NSData *theData = [theString dataUsingEncoding:NSUTF8StringEncoding];
             return(theData);
             };
@@ -46,10 +50,6 @@
         URL = inURL;
         }
     return(self);
-    }
-    
-- (void)dealloc
-    {
     }
     
 - (BOOL)logging:(CLogging *)inLogging didLogEvent:(CLogEvent *)inEvent;
@@ -88,19 +88,15 @@
 
     int theFileDescriptor = open([self.URL.path UTF8String], O_WRONLY);
 
-
     NSData *theTerminalData = self.terminalData;
-    size_t theTerminalDataLength = theTerminalData.length;
+    const size_t theTerminalDataLength = theTerminalData.length;
     
-    if (theTerminalData.length > 0)
+    off_t theOffset = lseek(theFileDescriptor, -theTerminalDataLength, SEEK_END);
+    if (theOffset < 0)
         {
-        off_t theOffset = lseek(theFileDescriptor, -theTerminalDataLength, SEEK_END);
-        if (theOffset < 0)
-            {
-            NSLog(@"Error seeking %d", errno);
-            close(theFileDescriptor);
-            return(NO);
-            }
+        NSLog(@"Error seeking %d", errno);
+        close(theFileDescriptor);
+        return(NO);
         }
     
     if (theData.length > 0)

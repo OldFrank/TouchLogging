@@ -32,7 +32,6 @@
 #include <stdarg.h>
 
 #import "CLogEvent.h"
-#import "CLogSession.h"
 #import "FileFunctionLine.h"
 
 @class CLogEvent;
