@@ -10,4 +10,6 @@
 
 @interface NSException (NSException_LoggingExtensions)
 
+- (void)log;
+
 @end
