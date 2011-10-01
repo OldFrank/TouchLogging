@@ -10,6 +10,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #import "CLogSession.h"
 
@@ -87,11 +88,16 @@
         }
 
     int theFileDescriptor = open([self.URL.path UTF8String], O_WRONLY);
+    
+    struct stat theStatBuffer;
+    fstat(theFileDescriptor, &theStatBuffer);
+
+
 
     NSData *theTerminalData = self.terminalData;
     const size_t theTerminalDataLength = theTerminalData.length;
     
-    off_t theOffset = lseek(theFileDescriptor, -theTerminalDataLength, SEEK_END);
+    off_t theOffset = lseek(theFileDescriptor, theStatBuffer.st_size -theTerminalDataLength, SEEK_SET);
     if (theOffset < 0)
         {
         NSLog(@"Error seeking %d", errno);

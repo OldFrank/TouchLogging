@@ -34,6 +34,7 @@
 #import "CFileLoggingDestination.h"
 #import "CFileHandleLoggingDestination.h"
 #import "CLogSession.h"
+#import "CLogEvent+Extensions.h"
 
 NSString *kLogSenderKey = @"sender";
 NSString *kLogFacilityKey = @"facility";
@@ -98,20 +99,32 @@ static CLogging *gSharedInstance = NULL;
     {
     [self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleWithStandardError]]];
 
+    // #########################################################################
+
     NSError *theError = NULL;
     NSURL *theLogDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSLibraryDirectory inDomain:NSUserDomainMask appropriateForURL:0 create:YES error:&theError];
     
     theLogDirectoryURL = [theLogDirectoryURL URLByAppendingPathComponent:@"Logs" isDirectory:YES];
     [[NSFileManager defaultManager] createDirectoryAtURL:theLogDirectoryURL withIntermediateDirectories:YES attributes:NULL error:&theError];
     
-    NSURL *theLogFileURL = [theLogDirectoryURL URLByAppendingPathComponent:@"Run.log"];
+    NSURL *theLogFileURL = [theLogDirectoryURL URLByAppendingPathComponent:@"log.json"];
     
-    if ([theLogFileURL checkResourceIsReachableAndReturnError:&theError] == NO)
+    CFileLoggingDestination *theFileLoggingDestination = [[CFileLoggingDestination alloc] initWithURL:theLogFileURL];
+    theFileLoggingDestination.initialData = [@"[\n" dataUsingEncoding:NSUTF8StringEncoding];
+    theFileLoggingDestination.block = ^(CLogEvent *inEvent)
         {
-        [[NSData data] writeToURL:theLogFileURL atomically:NO];
-        }
+        NSMutableData *theChunk = [[inEvent asJSON] mutableCopy];
+        [theChunk appendData:[@",\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        
+        return(theChunk);
+        };
+
+    theFileLoggingDestination.terminalData = [@"\n{}\n]\n" dataUsingEncoding:NSUTF8StringEncoding];
     
-    [self addDestination:[[CFileLoggingDestination alloc] initWithURL:theLogFileURL]];
+    
+    
+    
+    [self addDestination:theFileLoggingDestination];
     }
 
 - (void)addDestination:(id <CLoggingDestination>)inHandler
