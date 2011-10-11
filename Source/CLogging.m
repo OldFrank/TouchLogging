@@ -35,6 +35,7 @@
 #import "CFileHandleLoggingDestination.h"
 #import "CLogSession.h"
 #import "CLogEvent+Extensions.h"
+#import "CJSONFileLoggingDestination.h"
 
 NSString *kLogSenderKey = @"sender";
 NSString *kLogFacilityKey = @"facility";
@@ -109,20 +110,7 @@ static CLogging *gSharedInstance = NULL;
     
     NSURL *theLogFileURL = [theLogDirectoryURL URLByAppendingPathComponent:@"log.json"];
     
-    CFileLoggingDestination *theFileLoggingDestination = [[CFileLoggingDestination alloc] initWithURL:theLogFileURL];
-    theFileLoggingDestination.initialData = [@"[\n" dataUsingEncoding:NSUTF8StringEncoding];
-    theFileLoggingDestination.block = ^(CLogEvent *inEvent)
-        {
-        NSMutableData *theChunk = [[inEvent asJSON] mutableCopy];
-        [theChunk appendData:[@",\n" dataUsingEncoding:NSUTF8StringEncoding]];
-        
-        return(theChunk);
-        };
-
-    theFileLoggingDestination.terminalData = [@"\n{}\n]\n" dataUsingEncoding:NSUTF8StringEncoding];
-    
-    
-    
+    CJSONFileLoggingDestination *theFileLoggingDestination = [[CJSONFileLoggingDestination alloc] initWithURL:theLogFileURL];
     
     [self addDestination:theFileLoggingDestination];
     }
