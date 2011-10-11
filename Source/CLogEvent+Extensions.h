@@ -34,6 +34,6 @@
 @interface CLogEvent (Extensions)
 
 - (NSDictionary *)asDictionary;
-- (NSData *)asJSON;
+- (NSDictionary *)asJSON;
 
 @end
