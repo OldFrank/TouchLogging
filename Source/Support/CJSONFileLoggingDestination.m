@@ -33,6 +33,7 @@
 
 #import "CFilteringJSONSerializer.h"
 #import "CLogEvent.h"
+#import "CLogEvent+Extensions.h"
 #import "NSDate_InternetDateExtensions.h"
 
 @implementation CJSONFileLoggingDestination
@@ -42,18 +43,32 @@
 	if ((self = [super init]) != NULL)
 		{
 		CFilteringJSONSerializer *theSerializer = (id)[CFilteringJSONSerializer serializer];
-		theSerializer.convertersByName = [NSDictionary dictionaryWithObjectsAndKeys:
-			[^(NSDate *inDate) { return((id)[inDate ISO8601String]); } copy], @"date",
-			NULL];
 		theSerializer.tests = [NSSet setWithObjects:
 			[^(id inObject) { return([inObject isKindOfClass:[NSDate class]] ? @"date" : NULL); } copy],
+			[^(id inObject) { return([inObject isKindOfClass:[NSURL class]] ? @"url" : NULL); } copy],
+			[^(id inObject) { return([inObject isKindOfClass:[NSError class]] ? @"error" : NULL); } copy],
+			[^(id inObject) { return([inObject respondsToSelector:@selector(asDictionary)] ? @"asDictionary" : NULL); } copy],
+			NULL];
+
+		theSerializer.convertersByName = [NSDictionary dictionaryWithObjectsAndKeys:
+			[^(NSDate *inDate) { return((id)[inDate ISO8601String]); } copy], @"date",
+			[^(NSURL *inURL) { return((id)[inURL absoluteString]); } copy], @"url",
+			[^(NSError *inError) { return([NSDictionary dictionaryWithObjectsAndKeys:
+                @"NSError", @"type",
+                inError.domain, @"domain",
+                [NSNumber numberWithInteger:inError.code], @"code",
+                inError.userInfo, @"userInfo",
+                NULL]); } copy], @"error",
+			[^(id obj) { return([obj asDictionary]); } copy], @"asDictionary",
 			NULL];
 
         self.initialData = [@"[\n" dataUsingEncoding:NSUTF8StringEncoding];
-        self.block= ^(CLogEvent *inEvent) {
-            NSMutableData *theData = [[theSerializer serializeDictionary:[inEvent asDictionary] error:NULL] mutableCopy];
+        self.block = ^(CLogEvent *inEvent) {
+            NSDictionary *theDictionary = [inEvent asDictionary];
+            NSError *theError = NULL;
+            NSMutableData *theData = [[theSerializer serializeDictionary:theDictionary error:&theError] mutableCopy];
+            NSAssert(theData != NULL, @"Could not convert data to JSON: %@", theError);
             [theData appendData:[@",\n" dataUsingEncoding:NSUTF8StringEncoding]];
-
             return(theData);
             };
         self.terminalData = [@"]\n" dataUsingEncoding:NSUTF8StringEncoding];
