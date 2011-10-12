@@ -35,8 +35,8 @@
 }
 
 @property (readonly, nonatomic, assign) CLogSession *parentSession;
-@property (readonly, nonatomic, retain) NSString *identifier;
-@property (readonly, nonatomic, retain) NSDate *started;
+@property (readonly, nonatomic, strong) NSString *identifier;
+@property (readonly, nonatomic, strong) NSDate *started;
 
 - (id)initWithParentSession:(CLogSession *)inParentSession identifier:(NSString *)inIdentifier;
 

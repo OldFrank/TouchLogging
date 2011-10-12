@@ -35,7 +35,7 @@
 
 @interface CFileHandleLoggingDestination : NSObject <CLoggingDestination>
 
-@property (readwrite, nonatomic, retain) NSFileHandle *fileHandle;
+@property (readwrite, nonatomic, strong) NSFileHandle *fileHandle;
 @property (readwrite, nonatomic, copy) NSData *(^block)(CLogEvent *inEvent);
 
 - (id)initWithFileHandle:(NSFileHandle *)inFileHandle;

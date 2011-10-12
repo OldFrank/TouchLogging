@@ -53,8 +53,8 @@ extern NSString *kLogLineKey;
 @property (readwrite, atomic, assign) BOOL enabled;
 @property (readwrite, atomic, copy) NSString *sender;
 @property (readwrite, atomic, copy) NSString *facility;
-@property (readonly, atomic, retain) NSMutableArray *sessions;
-@property (readwrite, atomic, retain) NSMutableArray *destinations;
+@property (readonly, atomic, strong) NSMutableArray *sessions;
+@property (readwrite, atomic, strong) NSMutableArray *destinations;
 
 /** Returns the thread's logging instance */
 + (CLogging *)sharedInstance;

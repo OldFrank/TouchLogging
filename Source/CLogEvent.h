@@ -47,13 +47,13 @@ typedef enum {
 @interface CLogEvent : NSObject {
 }
 
-@property (readwrite, nonatomic, retain) CLogSession *session;
+@property (readwrite, nonatomic, strong) CLogSession *session;
 @property (readwrite, nonatomic, assign) NSInteger level;
-@property (readwrite, nonatomic, retain) NSDate *timestamp;
-@property (readwrite, nonatomic, retain) NSString *sender;
-@property (readwrite, nonatomic, retain) NSString *facility;
-@property (readwrite, nonatomic, retain) NSString *message;
-@property (readwrite, nonatomic, retain) NSDictionary *userInfo;
+@property (readwrite, nonatomic, strong) NSDate *timestamp;
+@property (readwrite, nonatomic, strong) NSString *sender;
+@property (readwrite, nonatomic, strong) NSString *facility;
+@property (readwrite, nonatomic, strong) NSString *message;
+@property (readwrite, nonatomic, strong) NSDictionary *userInfo;
 
 + (NSString *)stringForLevel:(NSInteger)inLevel;
 

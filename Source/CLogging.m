@@ -47,7 +47,7 @@ NSString *kLogLineKey = @"line";
 static CLogging *gSharedInstance = NULL;
 
 @interface CLogging ()
-@property (readwrite, nonatomic, retain) NSMutableSet *oneShotEvents;
+@property (readwrite, nonatomic, strong) NSMutableSet *oneShotEvents;
 @end
 
 #pragma mark -

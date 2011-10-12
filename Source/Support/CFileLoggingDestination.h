@@ -36,10 +36,10 @@
 @interface CFileLoggingDestination : NSObject <CLoggingDestination> {
 }
 
-@property (readwrite, nonatomic, retain) NSURL *URL;
+@property (readwrite, nonatomic, strong) NSURL *URL;
 @property (readwrite, nonatomic, copy) NSData *(^block)(CLogEvent *inEvent);
-@property (readwrite, nonatomic, retain) NSData *initialData;
-@property (readwrite, nonatomic, retain) NSData *terminalData;
+@property (readwrite, nonatomic, strong) NSData *initialData;
+@property (readwrite, nonatomic, strong) NSData *terminalData;
 
 - (id)initWithURL:(NSURL *)inURL;
 
