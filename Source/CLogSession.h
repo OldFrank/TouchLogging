@@ -34,7 +34,7 @@
 @interface CLogSession : NSObject {
 }
 
-@property (readonly, nonatomic, assign) CLogSession *parentSession;
+@property (readonly, nonatomic, weak) CLogSession *parentSession;
 @property (readonly, nonatomic, strong) NSString *identifier;
 @property (readonly, nonatomic, strong) NSDate *started;
 
