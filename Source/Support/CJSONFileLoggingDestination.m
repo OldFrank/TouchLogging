@@ -67,7 +67,6 @@
             NSDictionary *theDictionary = [inEvent asDictionary];
             NSError *theError = NULL;
             NSMutableData *theData = [[theSerializer serializeDictionary:theDictionary error:&theError] mutableCopy];
-            NSAssert(theData != NULL, @"Could not convert data to JSON: %@", theError);
             [theData appendData:[@",\n" dataUsingEncoding:NSUTF8StringEncoding]];
             return(theData);
             };
