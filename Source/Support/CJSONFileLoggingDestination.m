@@ -33,7 +33,7 @@
 
 #import "CFilteringJSONSerializer.h"
 #import "CLogEvent.h"
-#import "CLogEvent+Extensions.h"
+#import "CLogEvent_Extensions.h"
 #import "NSDate_InternetDateExtensions.h"
 
 @implementation CJSONFileLoggingDestination

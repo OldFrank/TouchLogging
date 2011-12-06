@@ -34,7 +34,7 @@
 #import "CFileLoggingDestination.h"
 #import "CFileHandleLoggingDestination.h"
 #import "CLogSession.h"
-#import "CLogEvent+Extensions.h"
+#import "CLogEvent_Extensions.h"
 #import "CJSONFileLoggingDestination.h"
 
 NSString *kLogSenderKey = @"sender";

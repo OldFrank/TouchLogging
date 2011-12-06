@@ -1,5 +1,5 @@
 //
-//  CLogEvent+Extensions.h
+//  CLogEvent_Extensions.m
 //  TouchCode
 //
 //  Created by Jonathan Wight on 9/30/11.
@@ -29,11 +29,39 @@
 //  authors and should not be interpreted as representing official policies, either expressed
 //  or implied, of 2011 Jonathan Wight.
 
-#import "CLogEvent.h"
+#import "CLogEvent_Extensions.h"
 
-@interface CLogEvent (Extensions)
+@implementation CLogEvent (CLogEvent_Extensions)
 
-- (NSDictionary *)asDictionary;
-- (NSDictionary *)asJSON;
+- (NSDictionary *)asDictionary
+    {
+    NSMutableDictionary *theDictionary = [NSMutableDictionary dictionary];
+    // session
+    [theDictionary setObject:[NSNumber numberWithInteger:self.level] forKey:@"level"];
+    [theDictionary setObject:self.timestamp forKey:@"timestamp"];
+    if (self.sender.length > 0)
+        {
+        [theDictionary setObject:self.sender forKey:@"sender"];
+        }
+    if (self.facility.length > 0)
+        {
+        [theDictionary setObject:self.facility forKey:@"facility"];
+        }
+    if (self.message.length > 0)
+        {
+        [theDictionary setObject:self.message forKey:@"message"];
+        }
+    if (self.userInfo.count > 0)
+        {
+        [theDictionary setObject:self.userInfo forKey:@"userInfo"];
+        }
+
+    return([theDictionary copy]);
+    }
+
+- (NSDictionary *)asJSON
+    {
+    return([self asDictionary]);
+    }
 
 @end
