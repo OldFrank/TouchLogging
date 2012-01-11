@@ -98,7 +98,10 @@ static CLogging *gSharedInstance = NULL;
 
 - (void)addDefaultDestinations
     {
-    [self addDestination:[[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleWithStandardError]]];
+    CFileHandleLoggingDestination *theStderrLog = [[CFileHandleLoggingDestination alloc] initWithFileHandle:[NSFileHandle fileHandleWithStandardError]];
+    theStderrLog.squashRepeats = YES;
+    
+    [self addDestination:theStderrLog];
 
     // #########################################################################
 

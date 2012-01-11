@@ -44,7 +44,7 @@ typedef enum {
 
 @class CLogSession;
 
-@interface CLogEvent : NSObject {
+@interface CLogEvent : NSObject <NSCopying> {
 }
 
 @property (readwrite, nonatomic, strong) CLogSession *session;

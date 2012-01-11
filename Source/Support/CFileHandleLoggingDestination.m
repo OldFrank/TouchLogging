@@ -33,20 +33,37 @@
 
 #import "CLogSession.h"
 
+@interface CFileHandleLoggingDestination ()
+@property (readwrite, nonatomic, copy) CLogEvent *lastEvent;
+@property (readwrite, nonatomic, assign) NSInteger repeatCount;
+@end
+
+#pragma mark -
+
 @implementation CFileHandleLoggingDestination
 
 @synthesize fileHandle;
 @synthesize block;
+@synthesize squashRepeats;
+
+@synthesize lastEvent;
+@synthesize repeatCount;
 
 - (id)initWithFileHandle:(NSFileHandle *)inFileHandle
 	{
 	if ((self = [super init]) != NULL)
 		{
+        __weak CFileHandleLoggingDestination *_self = self;
         block = ^(CLogEvent *inEvent) {
             NSString *theLevelString = [CLogging nameForLevel:inEvent.level];
             NSTimeInterval theInterval = [inEvent.timestamp timeIntervalSinceDate:inEvent.session.started];
 
-            NSString *theString = [NSString stringWithFormat:@"%-5.5s:%6.3f: %@\n", [theLevelString UTF8String], theInterval, inEvent.message];
+            NSString *theString = [NSString stringWithFormat:@"%-5.5s:%6.3f: %@", [theLevelString UTF8String], theInterval, inEvent.message];
+            if (_self.repeatCount > 1)
+                {
+                theString = [theString stringByAppendingFormat:@"(repeated %d times)", _self.repeatCount];
+                }
+            theString = [theString stringByAppendingString:@"\n"];
             NSData *theData = [theString dataUsingEncoding:NSUTF8StringEncoding];
             return(theData);
             };
@@ -56,10 +73,40 @@
 	return(self);
 	}
 
+- (BOOL)loggingDidEnd:(CLogging *)inLogging;
+    {
+    if (self.lastEvent != NULL && self.repeatCount > 1)
+        {
+        NSData *theData = self.block(self.lastEvent);
+        [self.fileHandle writeData:theData];
+
+        self.lastEvent = NULL;
+        }
+    return(YES);
+    }
+
 - (BOOL)logging:(CLogging *)inLogging didLogEvent:(CLogEvent *)inEvent;
     {
-    NSData *theData = self.block(inEvent);
-    [self.fileHandle writeData:theData];
+    if (self.squashRepeats == YES && [self.lastEvent.message isEqualToString:inEvent.message])
+        {
+        self.repeatCount++;
+        }
+    else
+        {
+        if (self.repeatCount > 1)
+            {
+            NSData *theData = self.block(self.lastEvent);
+            [self.fileHandle writeData:theData];
+
+            self.repeatCount = 0;
+            self.lastEvent = NULL;
+            }
+        
+        NSData *theData = self.block(inEvent);
+        [self.fileHandle writeData:theData];
+        
+        self.lastEvent = inEvent;
+        }
     return(YES);
     }
 

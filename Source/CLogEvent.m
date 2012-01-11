@@ -72,5 +72,19 @@
             return([NSString stringWithFormat:@"%d", inLevel]);
         }
     }
+    
+- (id)copyWithZone:(NSZone *)zone;
+    {
+    CLogEvent *theCopy = [[CLogEvent alloc] init];
+    theCopy.session = self.session;
+    theCopy.level = self.level;
+    theCopy.timestamp = self.timestamp;
+    theCopy.sender = self.sender;
+    theCopy.facility = self.facility;
+    theCopy.message = self.message;
+    theCopy.userInfo = self.userInfo;
+    return(theCopy);
+    }
+
 
 @end

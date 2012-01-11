@@ -37,6 +37,7 @@
 
 @property (readwrite, nonatomic, strong) NSFileHandle *fileHandle;
 @property (readwrite, nonatomic, copy) NSData *(^block)(CLogEvent *inEvent);
+@property (readwrite, nonatomic, assign) BOOL squashRepeats;
 
 - (id)initWithFileHandle:(NSFileHandle *)inFileHandle;
 
