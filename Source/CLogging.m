@@ -64,11 +64,15 @@ static CLogging *gSharedInstance = NULL;
 
 + (CLogging *)sharedInstance
     {
+    #if LOGGING == 1
     static dispatch_once_t sOnceToken = 0;
     dispatch_once(&sOnceToken, ^{
         gSharedInstance = [[CLogging alloc] init];
         });
     return(gSharedInstance);
+    #else
+    return(NULL);
+    #endif
     }
 
 #pragma mark -
