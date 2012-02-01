@@ -34,5 +34,6 @@
 @interface NSError (NSException_LoggingExtensions)
 
 - (void)log;
+- (void)log:(NSString *)inFormat, ...;
 
 @end

@@ -37,9 +37,24 @@
 
 - (void)log
     {
+    [self log:NULL];
+    }
+
+- (void)log:(NSString *)inFormat, ...
+    {
     #if LOGGING == 1
-    [[CLogging sharedInstance] logException:self];
+    NSString *theMoreInfo = NULL;
+    if (inFormat)
+        {
+        va_list theArgs;
+        va_start(theArgs, inFormat);
+        theMoreInfo = [[NSString alloc] initWithFormat:inFormat arguments:theArgs];
+        va_end(theArgs);
+        }
+    
+    [[CLogging sharedInstance] logException:self moreInfo:theMoreInfo];
     #endif /* LOGGING == 1 */
     }
+
 
 @end

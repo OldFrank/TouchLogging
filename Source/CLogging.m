@@ -311,17 +311,27 @@ static CLogging *gSharedInstance = NULL;
 
 #pragma mark -
 
-- (void)logError:(NSError *)inError
+- (void)logError:(NSError *)inError moreInfo:(NSString *)inMoreInfo
     {
     NSMutableDictionary *theUserInfo = [NSMutableDictionary dictionaryWithDictionary:inError.userInfo];
     [theUserInfo setObject:[inError domain] forKey:@"domain"];
     [theUserInfo setObject:[NSNumber numberWithInteger:[inError code]] forKey:@"code"];
     if ([inError localizedDescription] != NULL)
+        {
         [theUserInfo setObject:[inError localizedDescription] forKey:@"localizedDescription"];
+        }
     if ([inError localizedFailureReason] != NULL)
+        {
         [theUserInfo setObject:[inError localizedFailureReason] forKey:@"localizedFailureReason"];
+        }
     if ([inError localizedRecoverySuggestion] != NULL)
+        {
         [theUserInfo setObject:[inError localizedRecoverySuggestion] forKey:@"localizedRecoverySuggestion"];
+        }
+    if (inMoreInfo)
+        {
+        [theUserInfo setObject:inMoreInfo forKey:@"moreInfo"];
+        }
 
     CLogEvent *theEvent = [[CLogEvent alloc] init];
 
@@ -331,16 +341,18 @@ static CLogging *gSharedInstance = NULL;
         {
         theEvent.level = [theLevelValue intValue];
         }
-    theEvent.message = [inError localizedDescription];
+    theEvent.message = inMoreInfo ?: [inError localizedDescription];
     theEvent.userInfo = theUserInfo;
 
     [self logEvent:theEvent];
     }
 
-- (void)logException:(NSException *)inException
+- (void)logException:(NSException *)inException moreInfo:(NSString *)inMoreInfo;
     {
     if ([inException.userInfo objectForKey:@"error"] != NULL)
-        [self logError:[inException.userInfo objectForKey:@"error"]];
+        {
+        [self logError:[inException.userInfo objectForKey:@"error"] moreInfo:inMoreInfo];
+        }
     else
         {
         NSDictionary *theUserInfo = [inException userInfo];

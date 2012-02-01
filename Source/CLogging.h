@@ -73,8 +73,8 @@ extern NSString *kLogLineKey;
 - (void)logLevel:(int)inLevel userInfo:(NSDictionary *)inDictionary messageFormat:(NSString *)inFormat, ...;
 - (void)logLevel:(int)inLevel fileFunctionLine:(SFileFunctionLine)inFileFunctionLine userInfo:(NSDictionary *)inDictionary messageFormat:(NSString *)inFormat, ...;
 
-- (void)logError:(NSError *)inError;
-- (void)logException:(NSException *)inException;
+- (void)logError:(NSError *)inError moreInfo:(NSString *)inMoreInfo;
+- (void)logException:(NSException *)inException moreInfo:(NSString *)inMoreInfo;
 
 + (NSString *)nameForLevel:(int)inLevel;
 
